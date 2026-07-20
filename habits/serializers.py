@@ -10,6 +10,8 @@ from habits.validators import (
 
 
 class HabitSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Habit
         fields = "__all__"
