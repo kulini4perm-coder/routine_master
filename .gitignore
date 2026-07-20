@@ -211,3 +211,5 @@ __marimo__/
 *.db
 
 .env
+__pycache__/
+.idea/
