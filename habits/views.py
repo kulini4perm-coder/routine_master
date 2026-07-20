@@ -6,7 +6,13 @@ from habits.paginators import HabitPaginator
 from habits.permissions import IsOwner
 from habits.serializers import HabitSerializer
 
+from drf_spectacular.utils import extend_schema
 
+
+@extend_schema(
+    summary="Создание новой привычки",
+    description="Принимает параметры привычки и привязывает текущего авторизованного пользователя как владельца."
+)
 class HabitCreateAPIView(generics.CreateAPIView):
     """ Создание новой привычки авторизованным пользователем """
 
@@ -18,6 +24,10 @@ class HabitCreateAPIView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
 
 
+@extend_schema(
+    summary="Список личных привычек пользователя",
+    description="Возвращает постраничный список (по 5 элементов) привычек текущего авторизованного пользователя."
+)
 class HabitListAPIView(generics.ListAPIView):
     """ Получение списка личных привычек текущего пользователя, пагинация по 5 привычек на страницу """
 
@@ -30,6 +40,10 @@ class HabitListAPIView(generics.ListAPIView):
         return Habit.objects.filter(user=self.request.user)
 
 
+@extend_schema(
+    summary="Список всех публичных привычек",
+    description="Возвращает постраничный список (по 5 элементов) привычек всех пользователей системы"
+)
 class PublicHabitListAPIView(generics.ListAPIView):
     """ Просмотр списка всех публичных привычек """
 
@@ -42,6 +56,10 @@ class PublicHabitListAPIView(generics.ListAPIView):
         return Habit.objects.filter(is_public=True)
 
 
+@extend_schema(
+    summary="Детальная информация о привычке",
+    description="Возвращает полную структуру полей конкретной привычки по её ID. Доступно только владельцу."
+)
 class HabitRetrieveAPIView(generics.RetrieveAPIView):
     """ Просмотр владельцем деталей конкретной привычки по ID """
 
@@ -50,6 +68,10 @@ class HabitRetrieveAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
 
 
+@extend_schema(
+    summary="Редактирование привычки",
+    description="Позволяет полностью или частично обновить поля привычки."
+)
 class HabitUpdateAPIView(generics.UpdateAPIView):
     """ Редактирование привычки владельцем """
 
@@ -58,6 +80,10 @@ class HabitUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
 
 
+@extend_schema(
+    summary="Удаление привычки",
+    description="Безвозвратно удаляет привычку из базы данных по её ID. Доступно только владельцу."
+)
 class HabitDestroyAPIView(generics.DestroyAPIView):
     """ Удаление привычки владельцем """
 
