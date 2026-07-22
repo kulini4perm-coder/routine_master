@@ -1,4 +1,4 @@
-import os
+from django.conf import settings
 import requests
 
 
@@ -6,8 +6,8 @@ def send_telegram_message(chat_id: str, text: str) -> None:
     """ Отправляет текстовое сообщение пользователю в Telegram.
     Режим без токена и рабочий режим """
 
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-    api_url = os.getenv("TELEGRAM_API_URL", "https://telegram.org")
+    bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", None) # Запрашиваем токен и адрес у config/settings.py
+    api_url = getattr(settings, "TELEGRAM_API_URL", "https://telegram.org")
 
     # Режим без токена для тестирования
     if not bot_token:

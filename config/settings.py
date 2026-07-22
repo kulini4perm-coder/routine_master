@@ -125,7 +125,11 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 # Настройки CORS
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "https://yourdomain.com",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
@@ -146,5 +150,8 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") # Запрашиваем токен и адрес у .env
+TELEGRAM_API_URL = os.getenv("TELEGRAM_API_URL", "https://api.telegram.org/bot")
 
 
