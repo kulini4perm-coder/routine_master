@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# Python / Poetry
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.htmlcov
+.pytest_cache/
+.poetry/
+poetry.lock
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Локальные переменные и база данных
+.env
+db.sqlite3
+staticfiles/
+media/
