@@ -2,9 +2,9 @@ name: Routine Master CI/CD Pipeline
 
 on:
   push:
-    branches: [ base_develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ base_develop ]
+    branches: [ main, develop]
 
 jobs:
   test:
