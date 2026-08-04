@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from celery.schedules import crontab
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,6 +76,13 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
+
+# для тестирования CI/CD внутри GitHub Actions
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
