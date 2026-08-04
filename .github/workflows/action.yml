@@ -67,7 +67,9 @@ jobs:
       - name: Generate local configuration files
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
-          echo "${{ secrets.NGINX_CONF }}" > nginx.conf
+          cat << 'EOF' > nginx.conf
+          ${{ secrets.NGINX_CONF }}
+          EOF
 
       - name: Copy files to server
         run: |
