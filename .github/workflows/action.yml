@@ -78,15 +78,12 @@ jobs:
         run: |
           ssh -v -T -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           cd ~/routine_master
-          
-          export TAG=${{ github.sha }}
-          export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-          
+                    
           docker stop education_system education_nginx routine_nginx || true
           docker rm education_system education_nginx routine_nginx || true
           
           docker compose down || true
-          
+          docker compose pull
           docker compose up -d
           
           sleep 4

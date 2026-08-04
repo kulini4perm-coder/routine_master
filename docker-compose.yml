@@ -31,7 +31,7 @@ services:
 
   # Веб-приложение Django
   web:
-    image: ${DOCKER_USERNAME}/routine_master:${TAG:-latest}
+    image: kulini4/routine_master:latest
     container_name: routine_web
     restart: always
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
@@ -65,7 +65,7 @@ services:
 
   # Celery для асинхронных задач
   celery:
-    image: ${DOCKER_USERNAME}/routine_master:${TAG:-latest}
+    image: kulini4/routine_master:latest
     container_name: routine_celery
     restart: always
     command: celery -A config worker -l INFO -P eventlet
@@ -80,7 +80,7 @@ services:
 
   # Планировщик Celery Beat
   celery_beat:
-    image: ${DOCKER_USERNAME}/routine_master:${TAG:-latest}
+    image: kulini4/routine_master:latest
     container_name: routine_celery_beat
     restart: always
     command: celery -A config beat -l INFO
