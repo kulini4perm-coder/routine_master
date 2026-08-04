@@ -82,6 +82,9 @@ jobs:
           export TAG=${{ github.sha }}
           export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
           
+          docker stop education_system education_nginx routine_nginx || true
+          docker rm education_system education_nginx routine_nginx || true
+          
           docker compose down || true
           
           docker compose up -d

@@ -38,7 +38,6 @@ services:
     expose:
       - 8000
     volumes:
-      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     environment:
@@ -70,8 +69,6 @@ services:
     container_name: routine_celery
     restart: always
     command: celery -A config worker -l INFO -P eventlet
-    volumes:
-      - .:/app
     environment:
       - "HOST=db"
       - "REDIS_HOST=redis"
@@ -87,8 +84,6 @@ services:
     container_name: routine_celery_beat
     restart: always
     command: celery -A config beat -l INFO
-    volumes:
-      - .:/app
     environment:
       - "HOST=db"
       - "REDIS_HOST=redis"
