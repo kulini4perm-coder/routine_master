@@ -1,0 +1,96 @@
+name: Routine Master CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Linter (PEP 8 check)
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run tests
+        env:
+          SECRET_KEY: 'django-insecure-test-key-for-routine-master-automation'
+          DEBUG: 'True'
+          DB_ENGINE: 'django.db.backends.sqlite3'
+          DB_NAME: 'test_db'
+        run: python manage.py test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Log in Docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/routine_master:latest .
+
+      - name: Push Docker image in Docker hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/routine_master:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Generate local configuration files
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+          cat << 'EOF' > nginx.conf
+          ${{ secrets.NGINX_CONF }}
+          EOF
+
+      - name: Copy files to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ~/routine_master"
+          scp -o StrictHostKeyChecking=no .env nginx.conf docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/routine_master/
+
+      - name: Deploy to server via Docker Compose
+        run: |
+          ssh -v -T -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd ~/routine_master
+                    
+          docker stop education_system education_nginx routine_nginx || true
+          docker rm education_system education_nginx routine_nginx || true
+          
+          docker compose down || true
+          docker compose pull
+          docker compose up -d --force-recreate
+          
+          sleep 4
+          
+          docker compose run --rm web python manage.py migrate
+          docker compose run --rm web python manage.py collectstatic --no-input
+
+          EOF

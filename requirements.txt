@@ -1,0 +1,15 @@
+﻿celery
+coverage
+django
+django-cors-headers
+django-filter
+djangorestframework
+djangorestframework-simplejwt
+drf-spectacular
+eventlet
+pillow
+psycopg2-binary
+python-dotenv
+redis
+stripe
+gunicorn
